@@ -6,6 +6,7 @@ import { RestaurantScreen } from "./src/features/restaurant/screens/restaurant.s
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { RestaurantContextProvider } from "./src/services/restaurants/restaurants.context";
+import { LocationContextProvider } from "./src/services/location/location.context";
 
 import { theme } from "./src/infrastructure/themes";
 import { Ionicons } from "@expo/vector-icons";
@@ -46,39 +47,46 @@ export default function App() {
   return (
     <View style={styles.container}>
       <ThemeProvider theme={theme}>
-        <RestaurantContextProvider>
-          <NavigationContainer>
-            <Tab.Navigator
-              screenOptions={({ route }) => ({
-                tabBarIcon: ({ focused, color, size }) => {
-                  let iconName;
+        <LocationContextProvider>
+          <RestaurantContextProvider>
+            <NavigationContainer>
+              <Tab.Navigator
+                screenOptions={({ route }) => ({
+                  tabBarIcon: ({ focused, color, size }) => {
+                    let iconName;
 
-                  if (route.name === "Restaurants") {
-                    iconName = focused ? "restaurant" : "restaurant-outline";
-                  } else if (route.name === "Settings") {
-                    iconName = focused ? "settings" : "settings-outline";
-                  } else if (route.name === "Map") {
-                    iconName = focused ? "map" : "map-outline";
-                  }
+                    if (route.name === "Restaurants") {
+                      iconName = focused ? "restaurant" : "restaurant-outline";
+                    } else if (route.name === "Settings") {
+                      iconName = focused ? "settings" : "settings-outline";
+                    } else if (route.name === "Map") {
+                      iconName = focused ? "map" : "map-outline";
+                    }
 
-                  // You can return any component that you like here!
-                  return <Ionicons name={iconName} size={size} color={color} />;
-                },
-              })}
-              tabBarOptions={{
-                activeTintColor: "tomato",
-                inactiveTintColor: "gray",
-              }}
-            >
-              <Tab.Screen
-                name="Restaurants"
-                component={() => <RestaurantScreen />}
-              />
-              <Tab.Screen name="Map" component={() => <MapScreen />} />
-              <Tab.Screen name="Settings" component={() => <SettingScreen />} />
-            </Tab.Navigator>
-          </NavigationContainer>
-        </RestaurantContextProvider>
+                    // You can return any component that you like here!
+                    return (
+                      <Ionicons name={iconName} size={size} color={color} />
+                    );
+                  },
+                })}
+                tabBarOptions={{
+                  activeTintColor: "tomato",
+                  inactiveTintColor: "gray",
+                }}
+              >
+                <Tab.Screen
+                  name="Restaurants"
+                  component={() => <RestaurantScreen />}
+                />
+                <Tab.Screen name="Map" component={() => <MapScreen />} />
+                <Tab.Screen
+                  name="Settings"
+                  component={() => <SettingScreen />}
+                />
+              </Tab.Navigator>
+            </NavigationContainer>
+          </RestaurantContextProvider>
+        </LocationContextProvider>
       </ThemeProvider>
       <ExpoStatusBar style="auto" />
     </View>
