@@ -14,32 +14,39 @@ import {
   RestaurantInformationCard,
   RestaurantInformationCardCover,
 } from "./restaurant-info-card.style";
+import { Favourites } from "../../../components/favourites/favourites.component";
 
 export const RestaurantInfoCard = ({ restaurant = {}, ...props }) => {
-  // console.log("REStuatut", restaurant);
   const {
     name = "My Restaurant",
     icon = "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/lodging-71.png",
     photos = [
       "https://southdenver.com/wp-content/uploads/2014/03/Couple-eating-at-restaurant.jpg",
     ],
-    address = "100 alibaba street, forty theives",
+    vicinity = "100 alibaba street, forty theives",
     isOpenNow = true,
     rating = 4,
     isOpen = true,
     isClosedTemporarily = true,
+    placeId,
   } = restaurant;
 
   const ratingArray = Array.from(new Array(Math.floor(rating)));
   return (
     <RestaurantInformationCard elevation={5}>
+      <Favourites restaurant={restaurant} />
       <RestaurantInformationCardCover key={name} source={{ uri: photos[0] }} />
       <Info>
         <Text>{name}</Text>
         <Section>
           <Rating>
-            {ratingArray.map(() => (
-              <SvgXml width="20" height="20" xml={star} />
+            {ratingArray.map((_, ind) => (
+              <SvgXml
+                width="20"
+                height="20"
+                xml={star}
+                key={`star-${placeId}-${ind}`}
+              />
             ))}
           </Rating>
           <SectionEnd>
@@ -54,7 +61,7 @@ export const RestaurantInfoCard = ({ restaurant = {}, ...props }) => {
             </Spacer>
           </SectionEnd>
         </Section>
-        <Address>{address}</Address>
+        <Address>{vicinity}</Address>
       </Info>
     </RestaurantInformationCard>
   );

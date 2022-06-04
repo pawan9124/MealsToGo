@@ -1,15 +1,27 @@
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, StatusBar } from "react-native";
 import { ThemeProvider } from "styled-components/native";
-import { RestaurantScreen } from "./src/features/restaurant/screens/restaurant.screen";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { RestaurantContextProvider } from "./src/services/restaurants/restaurants.context";
 import { LocationContextProvider } from "./src/services/location/location.context";
+import { AppNavigator } from "./src/infrastructure/navigation/app.navigator";
+import * as firebase from "firebase";
 
 import { theme } from "./src/infrastructure/themes";
-import { Ionicons } from "@expo/vector-icons";
+
+// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyCV8NsuxFhRIVyIckMOAeXbGH-2-vfhBGk",
+  authDomain: "mealstogo-e990f.firebaseapp.com",
+  projectId: "mealstogo-e990f",
+  storageBucket: "mealstogo-e990f.appspot.com",
+  messagingSenderId: "329290314364",
+  appId: "1:329290314364:web:e1e8507512ef9ac9274ff9",
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 import {
   useFonts as useOswaldFont,
@@ -19,26 +31,19 @@ import {
   useFonts as useLatoFont,
   Lato_400Regular,
 } from "@expo-google-fonts/lato";
-import { SafeArea } from "./src/components/utility/safearea.component";
-
-const Tab = createBottomTabNavigator();
-
-const SettingScreen = () => (
-  <SafeArea>
-    <Text>Setting</Text>
-  </SafeArea>
-);
-const MapScreen = () => (
-  <SafeArea>
-    <Text>Map</Text>
-  </SafeArea>
-);
+import { Navigation } from "./src/infrastructure/navigation";
+import { FavouritesContextProvider } from "./src/services/favourites/favourites.context";
+import { AuthenticationContextProvider } from "./src/services/authentication/authentication.context";
 
 export default function App() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const onChangeSearch = (query) => setSearchQuery(query);
   const [oswaldLoaded] = useOswaldFont({ Oswald_400Regular });
   const [latoLoaded] = useLatoFont({ Lato_400Regular });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  //Authetication input
+  // if (!isAuthenticated) {
+  //   return null;
+  // }
 
   if (!oswaldLoaded || !latoLoaded) {
     return null;
@@ -47,46 +52,9 @@ export default function App() {
   return (
     <View style={styles.container}>
       <ThemeProvider theme={theme}>
-        <LocationContextProvider>
-          <RestaurantContextProvider>
-            <NavigationContainer>
-              <Tab.Navigator
-                screenOptions={({ route }) => ({
-                  tabBarIcon: ({ focused, color, size }) => {
-                    let iconName;
-
-                    if (route.name === "Restaurants") {
-                      iconName = focused ? "restaurant" : "restaurant-outline";
-                    } else if (route.name === "Settings") {
-                      iconName = focused ? "settings" : "settings-outline";
-                    } else if (route.name === "Map") {
-                      iconName = focused ? "map" : "map-outline";
-                    }
-
-                    // You can return any component that you like here!
-                    return (
-                      <Ionicons name={iconName} size={size} color={color} />
-                    );
-                  },
-                })}
-                tabBarOptions={{
-                  activeTintColor: "tomato",
-                  inactiveTintColor: "gray",
-                }}
-              >
-                <Tab.Screen
-                  name="Restaurants"
-                  component={() => <RestaurantScreen />}
-                />
-                <Tab.Screen name="Map" component={() => <MapScreen />} />
-                <Tab.Screen
-                  name="Settings"
-                  component={() => <SettingScreen />}
-                />
-              </Tab.Navigator>
-            </NavigationContainer>
-          </RestaurantContextProvider>
-        </LocationContextProvider>
+        <AuthenticationContextProvider>
+          <Navigation />
+        </AuthenticationContextProvider>
       </ThemeProvider>
       <ExpoStatusBar style="auto" />
     </View>
